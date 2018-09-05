@@ -1,0 +1,7 @@
+#pragma once
+
+#define APP_TITLE		"@breakhack_GAME_TITLE@"
+#define MAJOR_VERSION	@spritegrid_MAJOR_VERSION@
+#define MINOR_VERSION	@spritegrid_MINOR_VERSION@
+#define PATCH_VERSION	@spritegrid_PATCH_VERSION@
+#define RELEASE_TYPE	"@spritegrid_RELEASE_TYPE@"
