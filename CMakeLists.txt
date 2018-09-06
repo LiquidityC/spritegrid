@@ -26,12 +26,9 @@ include_directories(
 	${SDL2_IMAGE_INCLUDE_DIR}
 	)
 
-add_definitions(-std=gnu11
-	-pedantic -Wall -Wextra -Wshadow
-	-Wpointer-arith -Wcast-qual
-	-Wstrict-prototypes
-	-Wmissing-prototypes
-	-Wconversion -Wno-sign-conversion
+add_definitions(-std=c++17)
+set(CMAKE_CXX_FLAGS_DEBUG
+	"${CMAKE_CXX_FLAGS_DEBUG} -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual -Wconversion -Wno-sign-conversion"
 	)
 
 add_executable(spritegrid

@@ -11,7 +11,7 @@ test:
 .PHONY: test
 
 run: $(all)
-	@./_build/spritegrid
+	@./build/spritegrid
 .PHONY: run
 
 lint:

@@ -3,10 +3,14 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <filesystem>
+#include <vector>
 
 #include "Config.h"
+#include "Definitions.h"
 
 static SDL_Window *g_window;
+static std::vector<std::string> filePaths;
 
 static bool
 initSDL()
@@ -49,13 +53,45 @@ gameLoop()
 	bool quit = false;
 
 	while (!quit) {
+		quit = true;
 	}
 	return 0;
 }
 
-int
-main()
+static void
+printUsage(const std::string &cmd)
 {
+	std::cerr << "Usage: " << cmd << " "
+		<< "[file(s)]" << std::endl;
+}
+
+static bool
+hasSuffix(const std::string &full, const std::string &suffix)
+{
+	if (suffix.size() > full.size())
+		return false;
+	return full.compare(full.size() - suffix.size(), suffix.size(), suffix.c_str()) == 0;
+}
+
+static void
+loadFilesForArgs(int argc, char **argv)
+{
+	for (auto i = 0; i < argc; ++i) {
+		std::string pathStr(argv[i]);
+		if (hasSuffix(pathStr, ".png")) {
+			filePaths.push_back(pathStr);
+		}
+	}
+}
+
+int
+main(int argc, char **argv)
+{
+	if (argc < 2) {
+		printUsage(argv[0]);
+		return 1;
+	}
+	loadFilesForArgs(argc-1, argv+1);
 	if (!initSDL())
 		return 1;
 	return gameLoop();
