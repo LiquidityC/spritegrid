@@ -1,5 +1,5 @@
 nnoremap <F1> :Make<cr>
-nnoremap <F2> :Make lint<cr>
+nnoremap <F2> :ter ++close ./build/testspritegrid<cr>
 nnoremap <F3> :Termdebug _build/spritegrid<cr>
 nnoremap <F4> :ter ++close ./build/spritegrid<cr>
 

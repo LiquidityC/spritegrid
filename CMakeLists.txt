@@ -33,6 +33,14 @@ set(CMAKE_CXX_FLAGS_DEBUG
 
 add_executable(spritegrid
 	src/SpriteGrid
+	src/StringUtil
+	)
+
+add_executable(testspritegrid
+	test/catch
+	src/StringUtil
+	test/SpriteGridTest
+	test/StringUtilTest
 	)
 
 target_link_libraries(spritegrid

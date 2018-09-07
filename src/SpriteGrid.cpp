@@ -8,6 +8,7 @@
 
 #include "Config.h"
 #include "Definitions.h"
+#include "StringUtil.h"
 
 static SDL_Window *g_window;
 static std::vector<std::string> filePaths;
@@ -63,14 +64,6 @@ printUsage(const std::string &cmd)
 {
 	std::cerr << "Usage: " << cmd << " "
 		<< "[file(s)]" << std::endl;
-}
-
-static bool
-hasSuffix(const std::string &full, const std::string &suffix)
-{
-	if (suffix.size() > full.size())
-		return false;
-	return full.compare(full.size() - suffix.size(), suffix.size(), suffix.c_str()) == 0;
 }
 
 static void
