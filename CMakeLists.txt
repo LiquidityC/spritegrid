@@ -44,6 +44,7 @@ add_executable(testspritegrid
 	)
 
 target_link_libraries(spritegrid
+	-lstdc++fs
 	${SDL2_LIBRARY}
 	${SDL2MAIN_LIBRARY}
 	${SDL2_IMAGE_LIBRARY}

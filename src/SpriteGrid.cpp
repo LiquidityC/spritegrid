@@ -4,14 +4,25 @@
 #include <string>
 #include <sstream>
 #include <filesystem>
+#include <set>
 #include <vector>
 
 #include "Config.h"
 #include "Definitions.h"
 #include "StringUtil.h"
 
+namespace fs = std::filesystem;
+
+static const std::vector<std::string> FILE_SUFFIXES = {
+	".png",
+	".gif",
+	".jpeg",
+	".jpg",
+	".img"
+};
+
 static SDL_Window *g_window;
-static std::vector<std::string> filePaths;
+static std::set<std::string> filePaths;
 
 static bool
 initSDL()
@@ -72,8 +83,12 @@ loadFilesForArgs(int argc, char **argv)
 	for (auto i = 0; i < argc; ++i) {
 		std::string pathStr(argv[i]);
 		if (hasSuffix(pathStr, ".png")) {
-			filePaths.push_back(pathStr);
+			filePaths.insert(pathStr);
 		}
+	}
+
+	for (auto &p: fs::directory_iterator(".")) {
+		std::cout << p << std::endl;
 	}
 }
 
