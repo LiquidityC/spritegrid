@@ -15,4 +15,8 @@ class Texture
 		bool loadFromFile(const std::string& path, SDL_Renderer *renderer);
 
 		void render(SDL_Renderer *renderer);
+
+		uint32_t getWidth() const;
+
+		uint32_t getHeight() const;
 };

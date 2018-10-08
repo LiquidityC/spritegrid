@@ -42,3 +42,15 @@ Texture::render(SDL_Renderer *renderer)
 {
 	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 }
+
+uint32_t
+Texture::getWidth() const
+{
+	return dim.w;
+}
+
+uint32_t
+Texture::getHeight() const
+{
+	return dim.h;
+}

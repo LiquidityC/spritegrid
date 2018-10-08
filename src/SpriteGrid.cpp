@@ -10,6 +10,8 @@
 #include "Config.h"
 #include "Definitions.h"
 #include "StringUtil.h"
+#include "Timer.h"
+#include "Texture.h"
 
 namespace fs = std::filesystem;
 
@@ -21,8 +23,11 @@ static const std::vector<std::string> FILE_SUFFIXES = {
 	".img"
 };
 
-static SDL_Window *g_window;
-static std::set<std::string> filePaths;
+static SDL_Window	*gWindow;
+static SDL_Renderer	*gRenderer;
+
+static std::vector<std::string> filePaths;
+static int32_t currentImageIndex = 0;
 
 static bool
 initSDL()
@@ -50,22 +55,89 @@ initSDL()
 		<< PATCH_VERSION << " "
 		<< RELEASE_TYPE;
 
-	g_window = SDL_CreateWindow(ss.str().c_str(),
+	gWindow = SDL_CreateWindow(ss.str().c_str(),
 								SDL_WINDOWPOS_UNDEFINED,
 								SDL_WINDOWPOS_UNDEFINED, 
 								400,
 								300,
 								SDL_WINDOW_SHOWN);
+
+	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
 	return true;
 }
+
+static void
+close()
+{
+	SDL_DestroyRenderer(gRenderer);
+	SDL_DestroyWindow(gWindow);
+	IMG_Quit();
+	SDL_Quit();
+}
+
+static void
+reload_texture_from_file(Texture& texture, const std::string& path)
+{
+	texture.loadFromFile(path, gRenderer);
+	SDL_SetWindowSize(gWindow, texture.getWidth(), texture.getHeight());
+}
+
+#define FPS 60
+#define SCREEN_TICKS_PER_FRAME (1000 / FPS)
 
 static int
 gameLoop()
 {
+	static int32_t lastImageIndex = currentImageIndex;
+	Timer capTimer;
 	bool quit = false;
 
+	Texture texture;
+	reload_texture_from_file(texture, filePaths[currentImageIndex]);
+
+	SDL_Event event;
 	while (!quit) {
-		quit = true;
+		capTimer.start();
+
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT)
+				quit = true;
+
+			if (event.type != SDL_KEYDOWN)
+				continue;
+
+			switch (event.key.keysym.sym) {
+				case SDLK_LEFT:
+					currentImageIndex--;
+					if (currentImageIndex < 0)
+						currentImageIndex = static_cast<int>(filePaths.size()) - 1;
+					break;
+				case SDLK_RIGHT:
+					currentImageIndex++;
+					if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
+						currentImageIndex = 0;
+					break;
+				default:
+					break;
+			}
+		}
+
+		if (lastImageIndex != currentImageIndex) {
+			reload_texture_from_file(texture, filePaths[currentImageIndex]);
+		}
+
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+		SDL_RenderClear(gRenderer);
+
+		texture.render(gRenderer);
+
+		SDL_RenderPresent(gRenderer);
+
+		uint32_t frameTicks = capTimer.getTicks();
+		if (frameTicks < SCREEN_TICKS_PER_FRAME) {
+			SDL_Delay(SCREEN_TICKS_PER_FRAME - frameTicks);
+		}
 	}
 	return 0;
 }
@@ -83,13 +155,21 @@ loadFilesForArgs(int argc, char **argv)
 	for (auto i = 0; i < argc; ++i) {
 		std::string pathStr(argv[i]);
 		if (hasAnySuffix(pathStr, FILE_SUFFIXES)) {
-			filePaths.insert(pathStr);
+			filePaths.push_back(pathStr);
 		}
 	}
 
-	for (auto &p: fs::directory_iterator(".")) {
-		if (hasAnySuffix(p.path().string(), FILE_SUFFIXES)) {
-			filePaths.insert(p.path().string());
+	if (argc == 1) {
+		fs::path root(argv[0]);
+		if (root.string() != ".") {
+			if (root.has_filename())
+				root.remove_filename();
+		}
+
+		for (auto &p: fs::directory_iterator(root)) {
+			if (hasAnySuffix(p.path().string(), FILE_SUFFIXES)) {
+				filePaths.push_back(p.path().string());
+			}
 		}
 	}
 }
@@ -104,5 +184,6 @@ main(int argc, char **argv)
 	loadFilesForArgs(argc-1, argv+1);
 	if (!initSDL())
 		return 1;
-	return gameLoop();
+	gameLoop();
+	close();
 }
