@@ -27,7 +27,7 @@ static std::set<std::string> filePaths;
 static bool
 initSDL()
 {
-	int imgFlags = IMG_INIT_PNG;
+	int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
