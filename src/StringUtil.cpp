@@ -8,3 +8,13 @@ hasSuffix(const std::string &full, const std::string &suffix)
 	return full.compare(full.size() - suffix.size(), suffix.size(), suffix.c_str()) == 0;
 }
 
+bool
+hasAnySuffix(const std::string& str,
+			 const std::vector<std::string>& suffixes)
+{
+	for (auto& suffix : suffixes) {
+		if (hasSuffix(str, suffix))
+			return true;
+	}
+	return false;
+}

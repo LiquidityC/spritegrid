@@ -82,13 +82,15 @@ loadFilesForArgs(int argc, char **argv)
 {
 	for (auto i = 0; i < argc; ++i) {
 		std::string pathStr(argv[i]);
-		if (hasSuffix(pathStr, ".png")) {
+		if (hasAnySuffix(pathStr, FILE_SUFFIXES)) {
 			filePaths.insert(pathStr);
 		}
 	}
 
 	for (auto &p: fs::directory_iterator(".")) {
-		std::cout << p << std::endl;
+		if (hasAnySuffix(p.path().string(), FILE_SUFFIXES)) {
+			filePaths.insert(p.path().string());
+		}
 	}
 }
 
