@@ -34,6 +34,7 @@ set(CMAKE_CXX_FLAGS_DEBUG
 add_executable(spritegrid
 	src/SpriteGrid
 	src/StringUtil
+	src/Texture
 	)
 
 add_executable(testspritegrid
