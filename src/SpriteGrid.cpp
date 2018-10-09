@@ -12,6 +12,7 @@
 #include "StringUtil.h"
 #include "Timer.h"
 #include "Texture.h"
+#include "Grid.h"
 
 namespace fs = std::filesystem;
 
@@ -77,10 +78,30 @@ close()
 }
 
 static void
+resize_window(const SDL_Rect& rect)
+{
+	SDL_SetWindowSize(gWindow, rect.w, rect.h);
+}
+
+static SDL_Rect
 reload_texture_from_file(Texture& texture, const std::string& path)
 {
 	texture.loadFromFile(path, gRenderer);
-	SDL_SetWindowSize(gWindow, texture.getWidth(), texture.getHeight());
+	SDL_Rect rect = { 0, 0, (int) texture.getWidth(), (int) texture.getHeight() };
+
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+
+	int32_t widthLimit = static_cast<uint32_t>(dm.w * 0.75);
+	int32_t heightLimit = static_cast<uint32_t>(dm.h * 0.75);
+
+	if (rect.w > widthLimit || rect.h > heightLimit) {
+		rect.w = rect.w >> 1;
+		rect.h = rect.h >> 1;
+	}
+	resize_window(rect);
+
+	return rect;
 }
 
 #define FPS 60
@@ -92,9 +113,11 @@ gameLoop()
 	static int32_t lastImageIndex = currentImageIndex;
 	Timer capTimer;
 	bool quit = false;
+	SDL_Rect renderRect;
+	Grid grid;
 
 	Texture texture;
-	reload_texture_from_file(texture, filePaths[currentImageIndex]);
+	renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex]);
 
 	SDL_Event event;
 	while (!quit) {
@@ -107,30 +130,50 @@ gameLoop()
 			if (event.type != SDL_KEYDOWN)
 				continue;
 
-			switch (event.key.keysym.sym) {
-				case SDLK_LEFT:
-					currentImageIndex--;
-					if (currentImageIndex < 0)
-						currentImageIndex = static_cast<int>(filePaths.size()) - 1;
-					break;
-				case SDLK_RIGHT:
-					currentImageIndex++;
-					if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
-						currentImageIndex = 0;
-					break;
-				default:
-					break;
+			if (event.key.keysym.mod == KMOD_NONE) {
+				switch (event.key.keysym.sym) {
+					case SDLK_LEFT:
+						currentImageIndex--;
+						if (currentImageIndex < 0)
+							currentImageIndex = static_cast<int>(filePaths.size()) - 1;
+						break;
+					case SDLK_RIGHT:
+						currentImageIndex++;
+						if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
+							currentImageIndex = 0;
+						break;
+					default:
+						break;
+				}
+			}
+
+			if (event.key.keysym.mod & KMOD_CTRL) {
+				switch (event.key.keysym.sym) {
+					case SDLK_PLUS:
+						renderRect.w = static_cast<int>(renderRect.w * 1.2);
+						renderRect.h = static_cast<int>(renderRect.h * 1.2);
+						resize_window(renderRect);
+						grid.setScale(grid.getScale() * 1.2);
+						break;
+					case SDLK_MINUS:
+						renderRect.w = static_cast<int>(renderRect.w * 0.8);
+						renderRect.h = static_cast<int>(renderRect.h * 0.8);
+						resize_window(renderRect);
+						grid.setScale(grid.getScale() * 0.8);
+						break;
+				}
 			}
 		}
 
 		if (lastImageIndex != currentImageIndex) {
-			reload_texture_from_file(texture, filePaths[currentImageIndex]);
+			renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex]);
 		}
 
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(gRenderer);
 
-		texture.render(gRenderer);
+		texture.render(gRenderer, nullptr, &renderRect);
+		grid.render(gRenderer, renderRect);
 
 		SDL_RenderPresent(gRenderer);
 

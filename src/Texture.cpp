@@ -38,9 +38,11 @@ Texture::loadFromFile(const std::string& path, SDL_Renderer *renderer)
 }
 
 void
-Texture::render(SDL_Renderer *renderer)
+Texture::render(SDL_Renderer *renderer,
+				const SDL_Rect* srcrect,
+				const SDL_Rect* destrect)
 {
-	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+	SDL_RenderCopy(renderer, texture, srcrect, destrect);
 }
 
 uint32_t
