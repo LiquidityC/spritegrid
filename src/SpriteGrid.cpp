@@ -61,7 +61,7 @@ initSDL()
 								SDL_WINDOWPOS_UNDEFINED, 
 								400,
 								300,
-								SDL_WINDOW_SHOWN);
+								SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -225,6 +225,10 @@ main(int argc, char **argv)
 		return 1;
 	}
 	loadFilesForArgs(argc-1, argv+1);
+	if (filePaths.empty()) {
+		std::cerr << "No image files found" << std::endl;
+		return 1;
+	}
 	if (!initSDL())
 		return 1;
 	gameLoop();
