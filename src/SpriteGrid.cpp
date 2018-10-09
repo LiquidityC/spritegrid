@@ -142,6 +142,15 @@ gameLoop()
 						if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
 							currentImageIndex = 0;
 						break;
+					case SDLK_PLUS:
+						grid.increaseSpacing();
+						break;
+					case SDLK_MINUS:
+						grid.decreaseSpacing();
+						break;
+					case SDLK_ESCAPE:
+						quit = true;
+						continue;
 					default:
 						break;
 				}

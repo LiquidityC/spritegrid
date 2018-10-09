@@ -23,3 +23,23 @@ Grid::getScale() const
 {
 	return scale;
 }
+
+void
+Grid::increaseSpacing()
+{
+	if (spacing == 8) {
+		spacing += 8;
+	} else if (spacing < 96) {
+		spacing += 16;
+	}
+}
+
+void
+Grid::decreaseSpacing()
+{
+	if (spacing == 16) {
+		spacing -= 8;
+	} else if (spacing >= 16) {
+		spacing -= 16;
+	}
+}

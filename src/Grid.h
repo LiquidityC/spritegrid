@@ -14,4 +14,8 @@ class Grid
 		void setScale(double);
 
 		double getScale() const;
+
+		void increaseSpacing();
+
+		void decreaseSpacing();
 };
