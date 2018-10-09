@@ -84,7 +84,7 @@ resize_window(const SDL_Rect& rect)
 }
 
 static SDL_Rect
-reload_texture_from_file(Texture& texture, const std::string& path)
+reload_texture_from_file(Texture& texture, const std::string& path, double scale)
 {
 	texture.loadFromFile(path, gRenderer);
 	SDL_Rect rect = { 0, 0, (int) texture.getWidth(), (int) texture.getHeight() };
@@ -99,6 +99,9 @@ reload_texture_from_file(Texture& texture, const std::string& path)
 		rect.w = rect.w >> 1;
 		rect.h = rect.h >> 1;
 	}
+
+	rect.w = static_cast<int>(rect.w * scale);
+	rect.h = static_cast<int>(rect.h * scale);
 	resize_window(rect);
 
 	return rect;
@@ -111,13 +114,14 @@ static int
 gameLoop()
 {
 	static int32_t lastImageIndex = currentImageIndex;
+	double scale = 1;
 	Timer capTimer;
 	bool quit = false;
 	SDL_Rect renderRect;
 	Grid grid;
 
 	Texture texture;
-	renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex]);
+	renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
 
 	SDL_Event event;
 	while (!quit) {
@@ -162,20 +166,20 @@ gameLoop()
 						renderRect.w = static_cast<int>(renderRect.w * 1.2);
 						renderRect.h = static_cast<int>(renderRect.h * 1.2);
 						resize_window(renderRect);
-						grid.setScale(grid.getScale() * 1.2);
+						grid.setScale(scale *= 1.2);
 						break;
 					case SDLK_MINUS:
 						renderRect.w = static_cast<int>(renderRect.w * 0.8);
 						renderRect.h = static_cast<int>(renderRect.h * 0.8);
 						resize_window(renderRect);
-						grid.setScale(grid.getScale() * 0.8);
+						grid.setScale(scale *= 0.8);
 						break;
 				}
 			}
 		}
 
 		if (lastImageIndex != currentImageIndex) {
-			renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex]);
+			renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
 		}
 
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);

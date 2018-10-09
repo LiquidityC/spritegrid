@@ -53,6 +53,11 @@ target_link_libraries(spritegrid
 	${SDL2_IMAGE_LIBRARY}
 	)
 
+enable_testing()
+add_test(NAME test
+	COMMAND testspritegrid
+	)
+
 # LINT:
 if (CPPCHECK_FOUND)
 	add_custom_target(lint
@@ -61,3 +66,5 @@ if (CPPCHECK_FOUND)
 		COMMENT "Run cppcheck"
 		)
 endif (CPPCHECK_FOUND)
+
+install(TARGETS spritegrid DESTINATION bin)
