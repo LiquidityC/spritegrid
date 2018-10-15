@@ -222,6 +222,9 @@ loadFilesForArgs(int argc, char **argv)
 				root.remove_filename();
 		}
 
+		if (root.empty())
+			root = fs::path(".");
+
 		for (auto &p: fs::directory_iterator(root)) {
 			if (hasAnySuffix(p.path().string(), FILE_SUFFIXES)) {
 				filePaths.push_back(p.path().string());
