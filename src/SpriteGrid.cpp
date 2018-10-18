@@ -26,6 +26,7 @@ static const std::vector<std::string> FILE_SUFFIXES = {
 };
 
 static SDL_Rect gViewport{};
+static std::string gTitle;
 
 static SDL_Window	*gWindow;
 static SDL_Renderer	*gRenderer;
@@ -58,8 +59,9 @@ initSDL()
 		<< MINOR_VERSION << "."
 		<< PATCH_VERSION << " "
 		<< RELEASE_TYPE;
+	gTitle = ss.str();
 
-	gWindow = SDL_CreateWindow(ss.str().c_str(),
+	gWindow = SDL_CreateWindow(gTitle.c_str(),
 								SDL_WINDOWPOS_UNDEFINED,
 								SDL_WINDOWPOS_UNDEFINED, 
 								400,
@@ -109,6 +111,8 @@ reload_texture_from_file(Texture& texture, const std::string& path, double scale
 
 	rect.w = static_cast<int>(rect.w * scale);
 	rect.h = static_cast<int>(rect.h * scale);
+
+	SDL_SetWindowTitle(gWindow, std::string(gTitle + " - " + path).c_str());
 	resize_window(rect);
 
 	return rect;
