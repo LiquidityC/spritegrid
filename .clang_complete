@@ -1,4 +1,4 @@
---std=c++17
+-std=c++17
 -DDEBUG
--include./build/Config.h
 -I/usr/include/SDL2/
+-include./build/debug/Config.h
