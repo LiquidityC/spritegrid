@@ -37,6 +37,7 @@ add_executable(spritegrid
 	src/Texture
 	src/Timer
 	src/Grid
+	src/Util
 	)
 
 add_executable(testspritegrid

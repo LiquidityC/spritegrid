@@ -13,6 +13,7 @@
 #include "Timer.h"
 #include "Texture.h"
 #include "Grid.h"
+#include "Util.h"
 
 namespace fs = std::filesystem;
 
@@ -31,17 +32,6 @@ static SDL_Renderer	*gRenderer;
 
 static std::vector<std::string> filePaths;
 static int32_t currentImageIndex = 0;
-
-#define debug(t) debug_print(__LINE__, __FILE__, t)
-
-template<typename T>
-static void
-debug_print(int line, const std::string& file, const T& t)
-{
-#ifdef DEBUG
-	std::cout << "[" << file << ":" << line << "]:\t" << t << std::endl;
-#endif
-}
 
 static bool
 initSDL()
@@ -88,21 +78,6 @@ close()
 	SDL_DestroyWindow(gWindow);
 	IMG_Quit();
 	SDL_Quit();
-}
-
-static std::ostream&
-operator<<(std::ostream& out, const SDL_Rect& rect)
-{
-	out << rect.x << "," << rect.y << " " << rect.w << "x" << rect.h;
-	return out;
-}
-
-static std::string
-operator+(const std::string& dest, const SDL_Rect& rect)
-{
-	std::stringstream ss;
-	ss << dest << rect;
-	return ss.str();
 }
 
 static void
