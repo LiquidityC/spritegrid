@@ -24,11 +24,24 @@ static const std::vector<std::string> FILE_SUFFIXES = {
 	".img"
 };
 
+static SDL_Rect gViewport{};
+
 static SDL_Window	*gWindow;
 static SDL_Renderer	*gRenderer;
 
 static std::vector<std::string> filePaths;
 static int32_t currentImageIndex = 0;
+
+#define debug(t) debug_print(__LINE__, __FILE__, t)
+
+template<typename T>
+static void
+debug_print(int line, const std::string& file, const T& t)
+{
+#ifdef DEBUG
+	std::cout << "[" << file << ":" << line << "]:\t" << t << std::endl;
+#endif
+}
 
 static bool
 initSDL()
@@ -77,15 +90,34 @@ close()
 	SDL_Quit();
 }
 
+static std::ostream&
+operator<<(std::ostream& out, const SDL_Rect& rect)
+{
+	out << rect.x << "," << rect.y << " " << rect.w << "x" << rect.h;
+	return out;
+}
+
+static std::string
+operator+(const std::string& dest, const SDL_Rect& rect)
+{
+	std::stringstream ss;
+	ss << dest << rect;
+	return ss.str();
+}
+
 static void
 resize_window(const SDL_Rect& rect)
 {
 	SDL_SetWindowSize(gWindow, rect.w, rect.h);
+	gViewport = rect;
+	debug("Viewport: " + rect);
 }
 
 static SDL_Rect
 reload_texture_from_file(Texture& texture, const std::string& path, double scale)
 {
+	debug("Reloading texture: " + path);
+
 	texture.loadFromFile(path, gRenderer);
 	SDL_Rect rect = { 0, 0, (int) texture.getWidth(), (int) texture.getHeight() };
 
@@ -122,6 +154,8 @@ gameLoop()
 
 	Texture texture;
 	renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
+
+	SDL_RenderSetViewport(gRenderer, &gViewport);
 
 	SDL_Event event;
 	while (!quit) {
@@ -180,6 +214,7 @@ gameLoop()
 
 		if (lastImageIndex != currentImageIndex) {
 			renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
+			lastImageIndex = currentImageIndex;
 		}
 
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
