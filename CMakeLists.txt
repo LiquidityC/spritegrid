@@ -53,6 +53,8 @@ add_executable(spritegrid
 	src/Update
 	src/Message
 	src/GridComponent
+	src/Image
+	src/TextureComponent
 	)
 
 add_executable(testspritegrid

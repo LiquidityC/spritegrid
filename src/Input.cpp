@@ -7,7 +7,7 @@ static int getKey(const SDL_Event& event)
 			case SDLK_LEFT:
 				return K_LEFT;
 			case SDLK_RIGHT:
-				return K_LEFT;
+				return K_RIGHT;
 			case SDLK_PLUS:
 				return K_PLUS;
 			case SDLK_MINUS:

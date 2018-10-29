@@ -3,12 +3,12 @@
 #include <SDL.h>
 #include "Vector2.h"
 
-#define K_PLUS		0x1
-#define K_MINUS		0x2
-#define K_C_PLUS	0x4
-#define K_C_MINUS	0x6
-#define K_RIGHT		0x8
-#define K_LEFT		0x10
+#define K_PLUS		0x01
+#define K_MINUS		0x02
+#define K_C_PLUS	0x04
+#define K_C_MINUS	0x08
+#define K_RIGHT		0x10
+#define K_LEFT		0x20
 
 class Input
 {
