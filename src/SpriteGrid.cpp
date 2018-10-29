@@ -14,6 +14,8 @@
 #include "Texture.h"
 #include "Grid.h"
 #include "Util.h"
+#include "Update.h"
+#include "GridComponent.h"
 
 namespace fs = std::filesystem;
 
@@ -128,11 +130,16 @@ gameLoop()
 	double scale = 1;
 	Timer capTimer;
 	bool quit = false;
-	SDL_Rect renderRect;
 	Grid grid;
+	grid.addComponent(new GridComponent());
+
+	Update update;
+	update.renderer = gRenderer;
 
 	Texture texture;
-	renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
+	update.drawRect = reload_texture_from_file(texture,
+											   filePaths[currentImageIndex],
+											   scale);
 
 	SDL_RenderSetViewport(gRenderer, &gViewport);
 
@@ -140,67 +147,47 @@ gameLoop()
 	while (!quit) {
 		capTimer.start();
 
+		update.input.reset();
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT)
 				quit = true;
-
-			if (event.type != SDL_KEYDOWN)
-				continue;
-
-			if (event.key.keysym.mod == KMOD_NONE) {
-				switch (event.key.keysym.sym) {
-					case SDLK_LEFT:
-						currentImageIndex--;
-						if (currentImageIndex < 0)
-							currentImageIndex = static_cast<int>(filePaths.size()) - 1;
-						break;
-					case SDLK_RIGHT:
-						currentImageIndex++;
-						if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
-							currentImageIndex = 0;
-						break;
-					case SDLK_PLUS:
-						grid.increaseSpacing();
-						break;
-					case SDLK_MINUS:
-						grid.decreaseSpacing();
-						break;
-					case SDLK_ESCAPE:
-						quit = true;
-						continue;
-					default:
-						break;
-				}
+			if (event.type == SDL_KEYDOWN) {
+				quit = event.key.keysym.sym == SDLK_ESCAPE;
 			}
 
-			if (event.key.keysym.mod & KMOD_CTRL) {
-				switch (event.key.keysym.sym) {
-					case SDLK_PLUS:
-						renderRect.w = static_cast<int>(renderRect.w * 1.2);
-						renderRect.h = static_cast<int>(renderRect.h * 1.2);
-						resize_window(renderRect);
-						grid.setScale(scale *= 1.2);
-						break;
-					case SDLK_MINUS:
-						renderRect.w = static_cast<int>(renderRect.w * 0.8);
-						renderRect.h = static_cast<int>(renderRect.h * 0.8);
-						resize_window(renderRect);
-						grid.setScale(scale *= 0.8);
-						break;
-				}
-			}
+			update.handleEvent(event);
+		}
+
+		if (update.input.isPressed(K_LEFT)) {
+			currentImageIndex--;
+			if (currentImageIndex < 0)
+				currentImageIndex = static_cast<int>(filePaths.size()) - 1;
+		} else if (update.input.isPressed(K_RIGHT)) {
+			currentImageIndex++;
+			if (currentImageIndex >= static_cast<int32_t>(filePaths.size()))
+				currentImageIndex = 0;
+		}
+
+		if (update.input.isPressed(K_C_PLUS)) {
+			update.drawRect.w = static_cast<int>(update.drawRect.w * 1.2);
+			update.drawRect.h = static_cast<int>(update.drawRect.h * 1.2);
+			resize_window(update.drawRect);
+		} else if (update.input.isPressed(K_C_MINUS)) {
+			update.drawRect.w = static_cast<int>(update.drawRect.w * 0.8);
+			update.drawRect.h = static_cast<int>(update.drawRect.h * 0.8);
+			resize_window(update.drawRect);
 		}
 
 		if (lastImageIndex != currentImageIndex) {
-			renderRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
+			update.drawRect = reload_texture_from_file(texture, filePaths[currentImageIndex], scale);
 			lastImageIndex = currentImageIndex;
 		}
 
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(gRenderer);
 
-		texture.render(gRenderer, nullptr, &renderRect);
-		grid.render(gRenderer, renderRect);
+		texture.render(gRenderer, nullptr, &update.drawRect);
+		grid.update(update);
 
 		SDL_RenderPresent(gRenderer);
 
@@ -212,14 +199,14 @@ gameLoop()
 	return 0;
 }
 
-static void
+	static void
 printUsage(const std::string &cmd)
 {
 	std::cerr << "Usage: " << cmd << " "
 		<< "[file(s)]" << std::endl;
 }
 
-static void
+	static void
 loadFilesForArgs(int argc, char **argv)
 {
 	for (auto i = 0; i < argc; ++i) {
@@ -247,7 +234,7 @@ loadFilesForArgs(int argc, char **argv)
 	}
 }
 
-int
+	int
 main(int argc, char **argv)
 {
 	if (argc < 2) {

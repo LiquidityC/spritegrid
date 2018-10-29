@@ -1,21 +1,11 @@
 #pragma once
 
 #include <SDL.h>
+#include <ECS.h>
 
-class Grid
+#include "Update.h"
+#include "Message.h"
+
+class Grid : public ECS::Entity<Update, Message>
 {
-	private:
-		uint32_t spacing = 16;
-		double scale = 1;
-
-	public:
-		void render(SDL_Renderer*, const SDL_Rect& drawRect);
-
-		void setScale(double);
-
-		double getScale() const;
-
-		void increaseSpacing();
-
-		void decreaseSpacing();
 };
