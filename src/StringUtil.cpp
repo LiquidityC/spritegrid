@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "StringUtil.h"
 
 bool
@@ -12,9 +13,8 @@ bool
 hasAnySuffix(const std::string& str,
 			 const std::vector<std::string>& suffixes)
 {
-	for (auto& suffix : suffixes) {
-		if (hasSuffix(str, suffix))
-			return true;
-	}
-	return false;
+	return std::any_of(suffixes.cbegin(), suffixes.cend(),
+					   [&str](const std::string& suffix) {
+						   return hasSuffix(str, suffix);
+					   });
 }

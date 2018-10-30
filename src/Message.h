@@ -17,7 +17,7 @@ class Message
 		std::string imagePath;
 
 	public:
-		Message(MessageType t) : type(t) { };
+		explicit Message(MessageType t) : type(t) { };
 
 		MessageType getType() const;
 };

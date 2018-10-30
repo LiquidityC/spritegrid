@@ -17,7 +17,7 @@ class Input
 				currentKeys = 0;
 
 	public:
-		SDL_Renderer *renderer;
+		SDL_Renderer *renderer = nullptr;
 		Vector2<int> mousePosition = Vector2(0, 0);	
 
 	public:

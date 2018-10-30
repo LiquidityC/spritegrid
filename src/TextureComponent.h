@@ -13,6 +13,7 @@ class TextureComponent : public Component
 	private:
 
 	public:
+		TextureComponent() : texture() { };
 		void loadImage(SDL_Renderer *renderer);
 		void update(const Update&);
 		void receive(const Message&);
